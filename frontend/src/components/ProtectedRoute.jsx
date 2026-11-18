@@ -25,14 +25,8 @@ function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-brand-background px-5">
-        <p className="rounded-2xl border border-slate-200 bg-brand-surface px-8 py-6 font-semibold text-slate-700 shadow-lg">
-          Not authorized
-        </p>
-      </main>
-    )
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />
   }
 
   return children

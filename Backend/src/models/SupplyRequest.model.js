@@ -5,6 +5,7 @@ const supplyRequestSchema = new mongoose.Schema({
     product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
     warehouse: { type: mongoose.Schema.Types.ObjectId, ref: "Warehouse", required: true },
     quantity: { type: Number, required: true, min: 1 },
+    note: { type: String },
     status: {
         type: String,
         enum: ["Pending", "Approved", "Rejected"],

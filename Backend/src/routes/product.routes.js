@@ -1,12 +1,21 @@
 import express from "express";
-import { createProduct, deleteProduct, getProducts, updateProduct } from "../controllers/product.controller.js";
+import {
+    createProduct,
+    deleteProduct,
+    getProduct,
+    getProducts,
+    updateProduct
+} from "../controllers/product.controller.js";
+import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
+
 const router = express.Router();
-import { authenticateToken, requireAdmin } from "../middlewares/auth.middleware.js";
-import upload from "../middlewares/upload.middleware.js";
-// /api/auth/register
-router.post("/create", authenticateToken,requireAdmin,upload.single("image"),createProduct);
-router.patch("/:productId", authenticateToken, requireAdmin, upload.single("image"), updateProduct);
-router.delete("/:productId", authenticateToken, requireAdmin, deleteProduct);
-router.get("/",getProducts);
+const canReadProducts = authorizeRoles("admin", "warehouseManager", "supplier", "salesRepresentative");
+
+router.use(authenticateToken);
+router.get("/", canReadProducts, getProducts);
+router.get("/:id", canReadProducts, getProduct);
+router.post("/", authorizeRoles("admin", "warehouseManager"), createProduct);
+router.put("/:id", authorizeRoles("admin", "warehouseManager"), updateProduct);
+router.delete("/:id", authorizeRoles("admin"), deleteProduct);
 
 export default router;

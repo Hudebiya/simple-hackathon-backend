@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import userModel from "../models/users.model.js";
+import { deleteImage, verifyImage } from "../utils/imagekit.js";
 
 const roles = ["admin", "warehouseManager", "supplier", "salesRepresentative"];
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -160,15 +161,32 @@ export async function updateUser(req, res) {
     }
 
     try {
+        const existingUser = await userModel.findById(userId).select("image imageFileId");
+        if (!existingUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        const oldImageFileId = existingUser.imageFileId;
+        if (typeof updates.imageFileId === "string" &&
+            updates.imageFileId.trim() &&
+            updates.imageFileId !== oldImageFileId) {
+            if (typeof updates.image !== "string" || !updates.image.trim()) {
+                return res.status(400).json({ message: "A new image URL is required with imageFileId." });
+            }
+            await verifyImage(updates.imageFileId, updates.image);
+        }
+
         if ("password" in updates) {
             updates.password = await bcrypt.hash(updates.password, 10);
         }
         const user = await userModel.findByIdAndUpdate(userId, updates, {
-            new: true,
+            returnDocument: "after",
             runValidators: true
         }).select("-password -googleId").populate("assignedWarehouses", "name location");
         if (!user) {
             return res.status(404).json({ message: "User not found." });
+        }
+        if (updates.imageFileId && updates.imageFileId !== oldImageFileId) {
+            await deleteImage(oldImageFileId);
         }
         return res.status(200).json({
             message: "User updated successfully.",

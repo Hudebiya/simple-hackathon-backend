@@ -40,9 +40,15 @@ export function loginUser(credentials) {
   return api.post('/api/auth/login', credentials)
 }
 
-export function registerUser({ name, email, password }) {
-  // The existing API names its required name field "username".
-  return api.post('/api/auth/register', { username: name, email, password })
+export function registerUser({ name, email, password, phone, role }) {
+  return api.post('/api/auth/register', {
+    name,
+    username: name,
+    email,
+    password,
+    phone,
+    role,
+  })
 }
 
 export function getApiErrorMessage(error, fallback) {

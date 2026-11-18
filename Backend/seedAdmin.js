@@ -22,7 +22,7 @@ try {
             },
             $setOnInsert: { email: demoAdmin.email }
         },
-        { upsert: true, new: true, runValidators: true }
+        { upsert: true, returnDocument: "after", runValidators: true }
     );
     console.log("Demo admin account is ready:");
     console.log(`Email: ${demoAdmin.email}`);

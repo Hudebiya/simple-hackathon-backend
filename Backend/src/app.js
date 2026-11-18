@@ -6,6 +6,14 @@ import passport from "passport";
 import "./config/passport.js";
 import authRoutes from "./routes/auth.routes.js";
 import usersRoutes from "./routes/users.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
+import productRoutes from "./routes/product.routes.js";
+import warehouseRoutes from "./routes/warehouse.routes.js";
+import stockRoutes from "./routes/stock.routes.js";
+import transactionRoutes from "./routes/transaction.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import supplyRequestRoutes from "./routes/supplyRequest.routes.js";
 
 import cookieParser from "cookie-parser";
 const app = express();
@@ -34,6 +42,14 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", authRoutes)
 app.use("/api/users", usersRoutes)
+app.use("/api/upload", uploadRoutes)
+app.use("/api/products", productRoutes)
+app.use("/api/warehouses", warehouseRoutes)
+app.use("/api/stock", stockRoutes)
+app.use("/api/transactions", transactionRoutes)
+app.use("/api/stats", statsRoutes)
+app.use("/api/orders", orderRoutes)
+app.use("/api/supply-requests", supplyRequestRoutes)
 
 app.use("/api", (_req, res) => {
   res.status(404).json({ message: "API route not found" })

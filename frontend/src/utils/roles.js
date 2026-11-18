@@ -1,0 +1,55 @@
+export const ROLE_CONFIG = {
+  admin: {
+    base: '/admin',
+    label: 'Admin',
+    routes: [
+      { path: '', file: 'Overview', label: 'Overview', nav: true },
+      { path: 'users', file: 'Users', label: 'Users', nav: true },
+      { path: 'products', file: 'Products', label: 'Products', nav: true },
+      { path: 'warehouses', file: 'Warehouses', label: 'Warehouses', nav: true },
+      { path: 'suppliers', file: 'Suppliers', label: 'Suppliers', nav: true },
+      { path: 'transactions', file: 'Transactions', label: 'Transactions', nav: true },
+      { path: 'orders', file: 'Orders', label: 'Orders', nav: true },
+      { path: 'supply-requests', file: 'SupplyRequests', label: 'Supply Requests', nav: true },
+      { path: 'low-stock', file: 'LowStock', label: 'Low Stock', nav: true },
+    ],
+  },
+  warehouseManager: {
+    base: '/manager',
+    label: 'Warehouse Manager',
+    routes: [
+      { path: '', file: 'Overview', label: 'Overview', nav: true },
+      { path: 'warehouses', file: 'Warehouses', label: 'My Warehouses', nav: true },
+      { path: 'inventory', file: 'Inventory', label: 'Inventory', nav: true },
+      { path: 'products', file: 'Products', label: 'Products', nav: true },
+      { path: 'stock-in', file: 'StockIn', label: 'Stock In', nav: true },
+      { path: 'stock-out', file: 'StockOut', label: 'Stock Out', nav: true },
+      { path: 'transactions', file: 'Transactions', label: 'Transactions', nav: true },
+      { path: 'orders', file: 'Orders', label: 'Orders', nav: true },
+      { path: 'supply-requests', file: 'SupplyRequests', label: 'Supply Requests', nav: true },
+      { path: 'low-stock', file: 'LowStock', label: 'Low Stock', nav: true },
+    ],
+  },
+  supplier: {
+    base: '/supplier',
+    label: 'Supplier',
+    routes: [
+      { path: '', file: 'Overview', label: 'Overview', nav: true },
+      { path: 'profile', file: 'Profile', label: 'My Profile', nav: true },
+      { path: 'products', file: 'Products', label: 'My Products', nav: true },
+      { path: 'requests/new', file: 'NewRequest', label: 'New Request', nav: true },
+      { path: 'requests', file: 'Requests', label: 'Request History', nav: true },
+    ],
+  },
+  salesRepresentative: {
+    base: '/sales',
+    label: 'Sales Representative',
+    routes: [
+      { path: '', file: 'Overview', label: 'Overview', nav: true },
+      { path: 'products', file: 'Products', label: 'Products', nav: true },
+      { path: 'orders/new', file: 'NewOrder', label: 'New Order', nav: true },
+      { path: 'orders', file: 'Orders', label: 'My Orders', nav: true },
+      { path: 'orders/:id', file: 'OrderDetails', label: 'Order Details', nav: false },
+    ],
+  },
+}

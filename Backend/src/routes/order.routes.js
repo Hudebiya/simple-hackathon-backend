@@ -1,12 +1,20 @@
 import express from "express";
-import { createOrder, getMyOrders, getAllOrders, updateOrderStatus } from "../controllers/order.controller.js";
-import { authenticateToken, requireAdmin } from "../middlewares/auth.middleware.js";
+import {
+    cancelOrder,
+    createOrder,
+    getOrder,
+    getOrders,
+    updateOrderStatus
+} from "../controllers/order.controller.js";
+import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
+const orderReaders = authorizeRoles("admin", "warehouseManager", "salesRepresentative");
 
-router.post("/", authenticateToken, createOrder);
-router.get("/my", authenticateToken, getMyOrders);
-router.get("/", authenticateToken, requireAdmin, getAllOrders);
-router.patch("/:id/status", authenticateToken, requireAdmin, updateOrderStatus);
+router.post("/", authenticateToken, authorizeRoles("salesRepresentative"), createOrder);
+router.get("/", authenticateToken, orderReaders, getOrders);
+router.get("/:id", authenticateToken, orderReaders, getOrder);
+router.put("/:id/status", authenticateToken, authorizeRoles("admin", "warehouseManager"), updateOrderStatus);
+router.put("/:id/cancel", authenticateToken, authorizeRoles("admin", "salesRepresentative"), cancelOrder);
 
 export default router;
