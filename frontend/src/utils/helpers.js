@@ -8,6 +8,15 @@ export function toList(data) {
   return []
 }
 
+export function idOf(value) {
+  if (value && typeof value === 'object') return value._id ?? value.id ?? ''
+  return value ?? ''
+}
+
+export function humanize(key) {
+  return key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
+}
+
 export function formatMoney(value) {
   return `Rs. ${Number(value || 0).toLocaleString()}`
 }
