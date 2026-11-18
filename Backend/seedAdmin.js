@@ -3,34 +3,34 @@ import mongoose from "mongoose";
 import userModel from "./src/models/users.model.js";
 import bcrypt from "bcryptjs";
 
-const [username, email, password, ...extraArgs] = process.argv.slice(2);
+const demoAdmin = {
+    name: "Demo Admin",
+    email: "admin@example.com",
+    password: "Admin123!"
+};
 
-if (!username || !email || !password || extraArgs.length > 0) {
-    console.error("Usage: node seedAdmin.js <username> <email> <password>");
+try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    const password = await bcrypt.hash(demoAdmin.password, 10);
+    await userModel.findOneAndUpdate(
+        { email: demoAdmin.email },
+        {
+            $set: {
+                name: demoAdmin.name,
+                password,
+                role: "admin"
+            },
+            $setOnInsert: { email: demoAdmin.email }
+        },
+        { upsert: true, new: true, runValidators: true }
+    );
+    console.log("Demo admin account is ready:");
+    console.log(`Email: ${demoAdmin.email}`);
+    console.log(`Password: ${demoAdmin.password}`);
+    console.log("Change the demo password before using this account outside development.");
+} catch (error) {
+    console.error("Unable to seed admin user:", error);
     process.exitCode = 1;
-} else {
-    try {
-        await mongoose.connect(process.env.MONGODB_URI);
-
-        const existingUser = await userModel.findOne({ email });
-        if (existingUser) {
-            existingUser.role = "admin";
-            await existingUser.save();
-            console.log(`Promoted ${email} to admin.`);
-        } else {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            await userModel.create({
-                username,
-                email,
-                password: hashedPassword,
-                role: "admin",
-            });
-            console.log(`Created admin user ${email}.`);
-        }
-    } catch (error) {
-        console.error("Unable to seed admin user:", error);
-        process.exitCode = 1;
-    } finally {
-        await mongoose.disconnect();
-    }
+} finally {
+    await mongoose.disconnect();
 }

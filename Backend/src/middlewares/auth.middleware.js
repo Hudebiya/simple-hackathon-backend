@@ -1,30 +1,50 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import userModel from "../models/users.model.js";
 
-export function authenticateToken(req,res,next){
+export async function authenticateToken(req, res, next) {
     const authorization = req.get("Authorization");
     const bearerToken = authorization?.match(/^Bearer\s+(\S+)$/i)?.[1];
     const token = bearerToken || req.cookies?.token;
 
-    if(!token) {
+    if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    try{
-        req.user = jwt.verify(token, process.env.JWT_SECRET_KEY)
-        next()
-    }catch(err){
-        res.status(401).json({
-            message:"Invalid Token",
-            err: err.message
-        })
+    let payload;
+    try {
+        payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    } catch {
+        return res.status(401).json({ message: "Invalid token" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(payload.id)) {
+        return res.status(401).json({ message: "Invalid token" });
     }
 
-}
-export function requireAdmin(req,res,next){
-    if( req.user.role !== "admin"){
-        return res.status(403).json({
-            message:"Forbidden"
-        })
+    try {
+        const user = await userModel.findById(payload.id).select("role assignedWarehouses");
+        if (!user) {
+            return res.status(401).json({ message: "User session is no longer valid" });
+        }
+
+        req.user = {
+            id: user._id.toString(),
+            role: user.role,
+            assignedWarehouses: user.assignedWarehouses
+        };
+        return next();
+    } catch (error) {
+        return next(error);
     }
-    next()
 }
+
+export function authorizeRoles(...roles) {
+    return function (req, res, next) {
+        if (!roles.includes(req.user?.role)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+        return next();
+    };
+}
+
+export const requireAdmin = authorizeRoles("admin");

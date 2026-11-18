@@ -1,15 +1,16 @@
 import mongoose from "mongoose"
 
-const userSchema= new mongoose.Schema({
-    username:{
+const userSchema = new mongoose.Schema({
+    name: {
         type: String,
-        unique: true,
-        required:true
+        trim: true
     },
-    email:  {
+    email: {
         type: String,
         unique: true,
-        required:true
+        required: true,
+        trim: true,
+        lowercase: true
     },
     googleId: {
         type: String,
@@ -20,24 +21,30 @@ const userSchema= new mongoose.Schema({
         type: String,
         required: function () { return !this.googleId; }
     },
-    role:{
+    phone: {
         type: String,
-        default: "user",
-        enum:["user","admin"]
+        trim: true
     },
-    cart:[{
-        product:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"product",
-            required:true
-        },
-        quantity:{
-            type:Number,
-            required:true,
-            min:1,
-            default:1
-        }
-    }]
-})
-const userModel = mongoose.model("user",userSchema)
+    role: {
+        type: String,
+        enum: ["admin", "warehouseManager", "supplier", "salesRepresentative"],
+        default: "salesRepresentative"
+    },
+    assignedWarehouses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Warehouse"
+    }],
+    image: {
+        type: String
+    },
+    imageFileId: {
+        type: String
+    }
+}, { timestamps: true })
+
+const userModel = mongoose.models.User || mongoose.model("User", userSchema)
+if (!mongoose.models.user) {
+    mongoose.model("user", userSchema)
+}
+
 export default userModel

@@ -5,6 +5,7 @@ import helmet from "helmet";
 import passport from "passport";
 import "./config/passport.js";
 import authRoutes from "./routes/auth.routes.js";
+import usersRoutes from "./routes/users.routes.js";
 
 import cookieParser from "cookie-parser";
 const app = express();
@@ -32,6 +33,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes)
+app.use("/api/users", usersRoutes)
 
 app.use("/api", (_req, res) => {
   res.status(404).json({ message: "API route not found" })
