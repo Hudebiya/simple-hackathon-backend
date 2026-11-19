@@ -9,7 +9,7 @@ import { authenticateToken, authorizeRoles } from "../middlewares/auth.middlewar
 
 const router = express.Router();
 
-router.get("/", authenticateToken, authorizeRoles("admin", "salesRepresentative", "warehouseManager"), getWarehouses);
+router.get("/", authenticateToken, authorizeRoles("admin", "salesRepresentative", "warehouseManager", "supplier"), getWarehouses);
 router.post("/", authenticateToken, authorizeRoles("admin"), createWarehouse);
 router.put("/:id", authenticateToken, authorizeRoles("admin"), updateWarehouse);
 router.delete("/:id", authenticateToken, authorizeRoles("admin"), deleteWarehouse);

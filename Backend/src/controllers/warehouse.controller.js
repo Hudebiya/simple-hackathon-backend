@@ -52,6 +52,13 @@ export async function createWarehouse(req, res) {
 
 export async function getWarehouses(req, res) {
     try {
+        if (req.user.role === "supplier") {
+            const warehouses = await warehouseModel.find({})
+                .select("name location -_id")
+                .sort({ createdAt: -1 });
+            return res.status(200).json({ warehouses });
+        }
+
         const filter = req.user.role === "warehouseManager"
             ? { _id: { $in: req.user.assignedWarehouses } }
             : {};
