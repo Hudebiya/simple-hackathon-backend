@@ -44,13 +44,21 @@ const demoProducts = [
     { name: "Keyboard", description: "Compact wired keyboard", sku: "DEMO-KEYBOARD-001", category: "Accessories", price: 29.99, lowStockLimit: 12, stock: 40 }
 ];
 
+async function upsertAndLog(model, filter, update, options, description) {
+    const existed = await model.exists(filter);
+    const record = await model.findOneAndUpdate(filter, update, options);
+    console.log(`${existed ? "Updated" : "Created"} ${description}.`);
+    return record;
+}
+
 try {
     await mongoose.connect(process.env.MONGODB_URI);
 
     const users = {};
     for (const demoUser of demoUsers) {
         const password = await bcrypt.hash(demoUser.password, 10);
-        users[demoUser.role] = await userModel.findOneAndUpdate(
+        users[demoUser.role] = await upsertAndLog(
+            userModel,
             { email: demoUser.email },
             {
                 $set: {
@@ -61,7 +69,8 @@ try {
                     role: demoUser.role
                 }
             },
-            { upsert: true, returnDocument: "after", runValidators: true }
+            { upsert: true, returnDocument: "after", runValidators: true },
+            `demo user ${demoUser.email}`
         );
     }
 
@@ -69,7 +78,8 @@ try {
     const warehouses = [];
     for (const demoWarehouse of demoWarehouses) {
         const existing = await warehouseModel.findOne({ name: demoWarehouse.name }).select("manager");
-        const warehouse = await warehouseModel.findOneAndUpdate(
+        const warehouse = await upsertAndLog(
+            warehouseModel,
             { name: demoWarehouse.name },
             {
                 $set: {
@@ -77,26 +87,34 @@ try {
                     manager: warehouseManager._id
                 }
             },
-            { upsert: true, returnDocument: "after", runValidators: true }
+            { upsert: true, returnDocument: "after", runValidators: true },
+            `demo warehouse ${demoWarehouse.name}`
         );
         if (existing?.manager && existing.manager.toString() !== warehouseManager._id.toString()) {
-            await userModel.updateOne(
+            const result = await userModel.updateOne(
                 { _id: existing.manager },
                 { $pull: { assignedWarehouses: warehouse._id } }
             );
+            if (result.modifiedCount) {
+                console.log(`Updated warehouse assignments for previous manager ${existing.manager}.`);
+            }
         }
         warehouses.push(warehouse);
     }
 
-    await userModel.updateOne(
+    const assignmentResult = await userModel.updateOne(
         { _id: warehouseManager._id },
         { $addToSet: { assignedWarehouses: { $each: warehouses.map(warehouse => warehouse._id) } } }
     );
+    if (assignmentResult.modifiedCount) {
+        console.log(`Updated assigned warehouses for ${warehouseManager.email}.`);
+    }
 
     const products = [];
     for (const demoProduct of demoProducts) {
         const { stock: initialQuantity, ...productFields } = demoProduct;
-        const product = await productModel.findOneAndUpdate(
+        const product = await upsertAndLog(
+            productModel,
             { sku: productFields.sku },
             {
                 $set: {
@@ -107,7 +125,8 @@ try {
                     imageFileId: null
                 }
             },
-            { upsert: true, returnDocument: "after", runValidators: true }
+            { upsert: true, returnDocument: "after", runValidators: true },
+            `demo product ${productFields.sku}`
         );
         products.push({ product, initialQuantity });
     }
@@ -116,40 +135,71 @@ try {
         for (const [index, warehouse] of warehouses.entries()) {
             const quantity = Math.floor(initialQuantity / warehouses.length) +
                 (index < initialQuantity % warehouses.length ? 1 : 0);
-            await stockModel.findOneAndUpdate(
+            await upsertAndLog(
+                stockModel,
                 { product: product._id, warehouse: warehouse._id },
                 { $set: { quantity } },
-                { upsert: true, returnDocument: "after", runValidators: true, setDefaultsOnInsert: true }
+                { upsert: true, returnDocument: "after", runValidators: true, setDefaultsOnInsert: true },
+                `stock record for ${product.sku} at ${warehouse.name}`
             );
-            await transactionModel.findOneAndUpdate(
-                {
-                    product: product._id,
+        }
+    }
+
+    const transactionProduct = products[0];
+    const retainedTransactionIds = new Set();
+    for (const [index, warehouse] of warehouses.entries()) {
+        const quantity = Math.floor(transactionProduct.initialQuantity / warehouses.length) +
+            (index < transactionProduct.initialQuantity % warehouses.length ? 1 : 0);
+        const transaction = await upsertAndLog(
+            transactionModel,
+            {
+                product: transactionProduct.product._id,
+                warehouse: warehouse._id,
+                transactionType: "stock-in",
+                note: "Demo seed initial stock",
+                performedBy: warehouseManager._id
+            },
+            {
+                $set: {
+                    quantity,
+                    note: "Demo seed initial stock"
+                },
+                $setOnInsert: {
+                    product: transactionProduct.product._id,
                     warehouse: warehouse._id,
                     transactionType: "stock-in",
-                    note: "Demo seed initial stock",
                     performedBy: warehouseManager._id
-                },
-                {
-                    $setOnInsert: {
-                        product: product._id,
-                        warehouse: warehouse._id,
-                        transactionType: "stock-in",
-                        quantity,
-                        note: "Demo seed initial stock",
-                        performedBy: warehouseManager._id
-                    }
-                },
-                { upsert: true, returnDocument: "after", runValidators: true }
-            );
+                }
+            },
+            { upsert: true, returnDocument: "after", runValidators: true },
+            `demo stock-in transaction for ${transactionProduct.product.sku} at ${warehouse.name}`
+        );
+        retainedTransactionIds.add(transaction._id.toString());
+    }
+
+    const previousDemoTransactions = await transactionModel.find({
+        product: { $in: products.map(({ product }) => product._id) },
+        warehouse: { $in: warehouses.map(warehouse => warehouse._id) },
+        transactionType: "stock-in",
+        note: "Demo seed initial stock",
+        performedBy: warehouseManager._id
+    }).select("_id");
+    for (const transaction of previousDemoTransactions) {
+        if (retainedTransactionIds.has(transaction._id.toString())) {
+            continue;
+        }
+        const result = await transactionModel.deleteOne({ _id: transaction._id });
+        if (result.deletedCount) {
+            console.log(`Removed legacy demo stock-in transaction ${transaction._id}.`);
         }
     }
 
     console.log("Demo data is ready. Demo credentials:");
     for (const demoUser of demoUsers) {
-        console.log(`${demoUser.role}: ${demoUser.email} / ${demoUser.password}`);
+        console.log(`${demoUser.role}: ${demoUser.email}`);
     }
 } catch (error) {
-    console.error("Unable to seed demo data:", error);
+    console.error("Unable to seed demo data:", error instanceof Error ? error.message : error);
     process.exitCode = 1;
 } finally {
     await mongoose.disconnect();
