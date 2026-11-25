@@ -42,7 +42,9 @@ export default function OrderDetails() {
           <DataTable columns={columns} rows={order.products ?? []} />
           <p className="text-right text-lg font-bold">Grand total: {formatMoney(order.totalAmount)}</p>
         </div>
-      ) : null}
+      ) : (
+        <p className="text-sm text-slate-500">No order details are available for this order.</p>
+      )}
     </div>
   )
 }

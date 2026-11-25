@@ -34,7 +34,7 @@ export default function SalesProducts() {
   return (
     <div>
       <PageHeader title="Products" />
-      <Notice>{products.error || stock.error}</Notice>
+      <Notice>{products.error || stock.error || warehouses.error}</Notice>
       <div className="mb-4 flex flex-wrap gap-3">
         <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} />
         <SelectInput value={category} onChange={(e) => setCategory(e.target.value)} style={{ maxWidth: '12rem' }}>
@@ -77,7 +77,7 @@ export default function SalesProducts() {
                   {p.sku} · {p.category}
                 </p>
                 <p className="mt-2 font-semibold text-brand-primary">{formatMoney(p.price)}</p>
-                <p className={`text-sm ${qty > 0 ? 'text-green-700' : 'text-red-600'}`}>
+                <p className={`text-sm ${qty > 0 ? 'text-green-700 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                   {qty > 0 ? `${qty} in stock` : 'Out of stock'}
                 </p>
                 <Button variant="secondary" className="mt-3 w-full" onClick={() => setSelected(p)}>

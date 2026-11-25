@@ -74,7 +74,7 @@ function InputField({
           } ${
             error
               ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
-              : 'border-slate-300 focus:border-brand-primary focus:ring-brand-primary/15'
+              : 'border-slate-300 focus:border-brand-primary focus:ring-brand-primary/15 dark:focus:border-violet-300 dark:focus:ring-violet-300/40'
           }`}
         />
         {isPassword && (
@@ -89,7 +89,7 @@ function InputField({
         )}
       </div>
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-sm text-red-600">
+        <p id={`${id}-error`} className="mt-1.5 text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       )}

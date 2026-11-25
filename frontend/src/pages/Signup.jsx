@@ -4,6 +4,7 @@ import AuthLayout from '../components/AuthLayout.jsx'
 import InputField from '../components/InputField.jsx'
 import { getApiErrorMessage } from '../api/axios.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import ThemeToggle from '../components/ThemeToggle.jsx'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -76,77 +77,80 @@ function Signup() {
   }
 
   return (
-    <AuthLayout
-      title="Create your account"
-      description="Get started with your Portal account."
-      notice={serverError ? { type: 'error', message: serverError } : null}
-      footer={
-        <>
-          Already have an account?{' '}
-          <Link
-            to="/login"
-            className="rounded-sm font-semibold text-brand-primary underline decoration-brand-primary/30 underline-offset-4 transition hover:text-[#5a4a83] hover:decoration-brand-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-primary"
+    <>
+      <ThemeToggle className="fixed right-4 top-4 z-50" />
+      <AuthLayout
+        title="Create your account"
+        description="Get started with your Portal account."
+        notice={serverError ? { type: 'error', message: serverError } : null}
+        footer={
+          <>
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="rounded-sm font-semibold text-brand-primary underline decoration-brand-primary/30 underline-offset-4 transition hover:text-[#5a4a83] hover:decoration-brand-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-primary"
+            >
+              Sign in
+            </Link>
+          </>
+        }
+      >
+        <form className="space-y-5" noValidate onSubmit={handleSubmit}>
+          <InputField
+            id="name"
+            label="Name"
+            value={form.name}
+            onChange={updateField}
+            error={errors.name}
+            placeholder="Your name"
+            autoComplete="name"
+          />
+          <InputField
+            id="email"
+            label="Email address"
+            type="email"
+            value={form.email}
+            onChange={updateField}
+            error={errors.email}
+            placeholder="you@example.com"
+            autoComplete="email"
+          />
+          <InputField
+            id="password"
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={updateField}
+            error={errors.password}
+            placeholder="At least 6 characters"
+            autoComplete="new-password"
+          />
+          <InputField
+            id="confirmPassword"
+            label="Confirm password"
+            type="password"
+            value={form.confirmPassword}
+            onChange={updateField}
+            error={errors.confirmPassword}
+            placeholder="Enter your password again"
+            autoComplete="new-password"
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-primary to-[#51427e] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-brand-primary disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:brightness-100"
           >
-            Sign in
-          </Link>
-        </>
-      }
-    >
-      <form className="space-y-5" noValidate onSubmit={handleSubmit}>
-        <InputField
-          id="name"
-          label="Name"
-          value={form.name}
-          onChange={updateField}
-          error={errors.name}
-          placeholder="Your name"
-          autoComplete="name"
-        />
-        <InputField
-          id="email"
-          label="Email address"
-          type="email"
-          value={form.email}
-          onChange={updateField}
-          error={errors.email}
-          placeholder="you@example.com"
-          autoComplete="email"
-        />
-        <InputField
-          id="password"
-          label="Password"
-          type="password"
-          value={form.password}
-          onChange={updateField}
-          error={errors.password}
-          placeholder="At least 6 characters"
-          autoComplete="new-password"
-        />
-        <InputField
-          id="confirmPassword"
-          label="Confirm password"
-          type="password"
-          value={form.confirmPassword}
-          onChange={updateField}
-          error={errors.confirmPassword}
-          placeholder="Enter your password again"
-          autoComplete="new-password"
-        />
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-primary to-[#51427e] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-brand-primary disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:brightness-100"
-        >
-          {isSubmitting && (
-            <span
-              aria-hidden="true"
-              className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-            />
-          )}
-          {isSubmitting ? 'Creating account…' : 'Create account'}
-        </button>
-      </form>
-    </AuthLayout>
+            {isSubmitting && (
+              <span
+                aria-hidden="true"
+                className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+              />
+            )}
+            {isSubmitting ? 'Creating account…' : 'Create account'}
+          </button>
+        </form>
+      </AuthLayout>
+    </>
   )
 }
 

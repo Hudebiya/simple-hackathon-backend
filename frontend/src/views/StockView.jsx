@@ -36,7 +36,7 @@ function StockView({ title, url = '/api/stock' }) {
       render: (r) => {
         const low = r.product?.lowStockLimit != null && r.quantity <= r.product.lowStockLimit
         return (
-          <span className={low ? 'font-bold text-red-600' : 'font-semibold'}>
+          <span className={low ? 'font-bold text-red-600 dark:text-red-400' : 'font-semibold'}>
             {r.quantity}
             {low ? ' (low)' : ''}
           </span>

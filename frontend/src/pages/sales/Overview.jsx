@@ -14,13 +14,18 @@ export default function SalesOverview() {
       {loading ? (
         <Spinner />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          <StatCard label="My orders" value={orders.length} />
-          <StatCard label="Pending" value={count('Pending')} />
-          <StatCard label="Processing" value={count('Processing')} />
-          <StatCard label="Completed" value={count('Completed')} />
-          <StatCard label="Cancelled" value={count('Cancelled')} />
-        </div>
+        <>
+          {orders.length === 0 && (
+            <p className="mb-4 text-sm text-slate-500">You haven’t created any orders yet.</p>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <StatCard label="My orders" value={orders.length} />
+            <StatCard label="Pending" value={count('Pending')} />
+            <StatCard label="Processing" value={count('Processing')} />
+            <StatCard label="Completed" value={count('Completed')} />
+            <StatCard label="Cancelled" value={count('Cancelled')} />
+          </div>
+        </>
       )}
     </div>
   )

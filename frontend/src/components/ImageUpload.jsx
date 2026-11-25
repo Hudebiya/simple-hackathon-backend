@@ -61,7 +61,7 @@ function ImageUpload({ value, onUploaded, label = 'Image' }) {
         {shown ? (
           <img src={shown} alt="Preview" className="h-20 w-20 rounded-lg border border-slate-200 object-cover" />
         ) : (
-          <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-400">
+          <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-brand-surface text-xs text-slate-400">
             No image
           </div>
         )}
@@ -74,7 +74,7 @@ function ImageUpload({ value, onUploaded, label = 'Image' }) {
             className="text-sm"
           />
           {uploading && <p className="mt-1 text-xs font-semibold text-brand-primary">Uploading…</p>}
-          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+          {error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>}
         </div>
       </div>
     </div>

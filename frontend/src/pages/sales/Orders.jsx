@@ -57,7 +57,7 @@ export default function SalesOrders() {
       <PageHeader title="My Orders" />
       <Notice>{error}</Notice>
       <Notice type={message.type}>{message.text}</Notice>
-      <DataTable columns={columns} rows={toList(data)} loading={loading} />
+      <DataTable columns={columns} rows={toList(data)} loading={loading} empty="You haven’t created any orders yet." />
       <ConfirmDialog
         open={Boolean(toCancel)}
         title="Cancel order"

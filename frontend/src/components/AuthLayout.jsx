@@ -71,8 +71,8 @@ function AuthLayout({ title, description, children, footer, notice }) {
               <div
                 className={`mb-6 rounded-xl border px-4 py-3 text-sm leading-5 ${
                   notice.type === 'error'
-                    ? 'border-red-200 bg-red-50 text-red-800'
-                    : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                    ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'
+                    : 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200'
                 }`}
                 role={notice.type === 'error' ? 'alert' : 'status'}
               >

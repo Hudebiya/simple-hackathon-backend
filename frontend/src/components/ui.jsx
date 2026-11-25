@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
 
 const BADGES = {
-  Pending: 'bg-amber-100 text-amber-800',
-  Processing: 'bg-blue-100 text-blue-800',
-  Completed: 'bg-green-100 text-green-800',
-  Approved: 'bg-green-100 text-green-800',
-  Cancelled: 'bg-red-100 text-red-800',
-  Rejected: 'bg-red-100 text-red-800',
-  'stock-in': 'bg-green-100 text-green-800',
-  'stock-out': 'bg-orange-100 text-orange-800',
+  Pending: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200',
+  Processing: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200',
+  Completed: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200',
+  Approved: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200',
+  Cancelled: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200',
+  Rejected: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200',
+  'stock-in': 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200',
+  'stock-out': 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200',
 }
 
 const BUTTONS = {
@@ -74,8 +74,8 @@ export function Notice({ type = 'error', children }) {
   if (!children) return null
   const style =
     type === 'success'
-      ? 'border-green-200 bg-green-50 text-green-800'
-      : 'border-red-200 bg-red-50 text-red-800'
+      ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
+      : 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'
   return (
     <div className={`mb-4 rounded-lg border px-4 py-3 text-sm ${style}`} role="alert">
       {children}
@@ -136,7 +136,7 @@ export function Modal({ open, title, onClose, children }) {
 
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 dark:bg-black/60">
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-brand-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">{title}</h2>

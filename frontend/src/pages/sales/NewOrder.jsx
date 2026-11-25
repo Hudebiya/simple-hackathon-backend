@@ -17,6 +17,19 @@ export default function NewOrder() {
   const [error, setError] = useState('')
 
   const productList = toList(products.data)
+  const warehouseList = toList(warehouses.data)
+  const stockList = toList(stock.data)
+  const stockByWarehouse = new Map()
+  stockList.forEach((item) => {
+    const warehouseId = idOf(item.warehouse)
+    const quantity = Number(item.quantity) || 0
+    if (warehouseId && quantity > 0) {
+      stockByWarehouse.set(warehouseId, (stockByWarehouse.get(warehouseId) ?? 0) + quantity)
+    }
+  })
+  const stockedWarehouses = warehouseList.filter((item) => stockByWarehouse.has(item._id))
+  const loading = products.loading || warehouses.loading || stock.loading
+  const fetchError = products.error || warehouses.error || stock.error
   const priceOf = (id) => productList.find((p) => p._id === id)?.price ?? 0
   const availableOf = (id) =>
     toList(stock.data).find((s) => idOf(s.product) === id && idOf(s.warehouse) === warehouse)?.quantity ?? 0
@@ -53,7 +66,7 @@ export default function NewOrder() {
     <div>
       <PageHeader title="Create Sales Order" />
       <form onSubmit={submit} className="max-w-3xl rounded-xl border border-slate-200 bg-brand-surface p-6">
-        <Notice>{error}</Notice>
+        <Notice>{error || fetchError}</Notice>
         <div className="grid gap-x-4 sm:grid-cols-2">
           <Field label="Customer name">
             <TextInput
@@ -73,15 +86,21 @@ export default function NewOrder() {
         <Field label="Warehouse">
           <SelectInput value={warehouse} onChange={(e) => setWarehouse(e.target.value)} required>
             <option value="">Select warehouse…</option>
-            {toList(warehouses.data).map((w) => (
+            {stockedWarehouses.map((w) => (
               <option key={w._id} value={w._id}>
-                {w.name}
+                {w.name} — {stockByWarehouse.get(w._id)} units available
               </option>
             ))}
           </SelectInput>
+          {!loading && !fetchError && stockedWarehouses.length === 0 && (
+            <p className="mt-1 text-sm text-slate-500">No warehouses currently have stock for any product.</p>
+          )}
         </Field>
 
         <p className="mb-2 text-sm font-medium text-slate-700">Products</p>
+        {!products.loading && !products.error && productList.length === 0 && (
+          <p className="mb-3 text-sm text-slate-500">No products are available to order.</p>
+        )}
         {rows.map((row, index) => {
           const available = row.product && warehouse ? availableOf(row.product) : null
           return (
@@ -96,7 +115,7 @@ export default function NewOrder() {
                   ))}
                 </SelectInput>
                 {available !== null && (
-                  <p className={`mt-1 text-xs ${available >= Number(row.quantity) ? 'text-slate-500' : 'text-red-600'}`}>
+                  <p className={`mt-1 text-xs ${available >= Number(row.quantity) ? 'text-slate-500' : 'text-red-600 dark:text-red-400'}`}>
                     Available: {available}
                   </p>
                 )}
@@ -126,7 +145,10 @@ export default function NewOrder() {
 
         <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-4">
           <p className="text-lg font-bold">Total: {formatMoney(total)}</p>
-          <Button type="submit" disabled={busy}>
+          <Button
+            type="submit"
+            disabled={busy || loading || Boolean(fetchError) || !productList.length || !stockedWarehouses.length}
+          >
             {busy ? 'Creating…' : 'Create order'}
           </Button>
         </div>

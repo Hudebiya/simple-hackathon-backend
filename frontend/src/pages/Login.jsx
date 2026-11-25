@@ -4,6 +4,7 @@ import AuthLayout from '../components/AuthLayout.jsx'
 import InputField from '../components/InputField.jsx'
 import { getApiErrorMessage } from '../api/axios.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import ThemeToggle from '../components/ThemeToggle.jsx'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -62,64 +63,67 @@ function Login() {
   }
 
   return (
-    <AuthLayout
-      title="Welcome back"
-      description="Sign in to continue to your account."
-      notice={
-        serverError
-          ? { type: 'error', message: serverError }
-          : successMessage
-            ? { type: 'success', message: successMessage }
-            : null
-      }
-      footer={
-        <>
-          Don’t have an account?{' '}
-          <Link
-            to="/signup"
-            className="rounded-sm font-semibold text-brand-primary underline decoration-brand-primary/30 underline-offset-4 transition hover:text-[#5a4a83] hover:decoration-brand-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-primary"
+    <>
+      <ThemeToggle className="fixed right-4 top-4 z-50" />
+      <AuthLayout
+        title="Welcome back"
+        description="Sign in to continue to your account."
+        notice={
+          serverError
+            ? { type: 'error', message: serverError }
+            : successMessage
+              ? { type: 'success', message: successMessage }
+              : null
+        }
+        footer={
+          <>
+            Don’t have an account?{' '}
+            <Link
+              to="/signup"
+              className="rounded-sm font-semibold text-brand-primary underline decoration-brand-primary/30 underline-offset-4 transition hover:text-[#5a4a83] hover:decoration-brand-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-primary"
+            >
+              Create one
+            </Link>
+          </>
+        }
+      >
+        <form className="space-y-5" noValidate onSubmit={handleSubmit}>
+          <InputField
+            id="email"
+            label="Email address"
+            type="email"
+            value={form.email}
+            onChange={updateField}
+            error={errors.email}
+            placeholder="you@example.com"
+            autoComplete="email"
+          />
+          <InputField
+            id="password"
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={updateField}
+            error={errors.password}
+            placeholder="Enter your password"
+            autoComplete="current-password"
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-primary to-[#51427e] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-brand-primary disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:brightness-100"
           >
-            Create one
-          </Link>
-        </>
-      }
-    >
-      <form className="space-y-5" noValidate onSubmit={handleSubmit}>
-        <InputField
-          id="email"
-          label="Email address"
-          type="email"
-          value={form.email}
-          onChange={updateField}
-          error={errors.email}
-          placeholder="you@example.com"
-          autoComplete="email"
-        />
-        <InputField
-          id="password"
-          label="Password"
-          type="password"
-          value={form.password}
-          onChange={updateField}
-          error={errors.password}
-          placeholder="Enter your password"
-          autoComplete="current-password"
-        />
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-primary to-[#51427e] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-brand-primary disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:brightness-100"
-        >
-          {isSubmitting && (
-            <span
-              aria-hidden="true"
-              className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-            />
-          )}
-          {isSubmitting ? 'Signing in…' : 'Sign in'}
-        </button>
-      </form>
-    </AuthLayout>
+            {isSubmitting && (
+              <span
+                aria-hidden="true"
+                className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+              />
+            )}
+            {isSubmitting ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+      </AuthLayout>
+    </>
   )
 }
 

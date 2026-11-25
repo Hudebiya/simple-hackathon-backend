@@ -4,7 +4,11 @@ import { Button, DataTable, Notice, PageHeader, StatusBadge } from '../component
 import useFetch from '../hooks/useFetch.js'
 import { formatDate, toList } from '../utils/helpers.js'
 
-function SupplyRequestsView({ canReview = false, showSupplier = false }) {
+function SupplyRequestsView({
+  canReview = false,
+  showSupplier = false,
+  emptyMessage = 'No supply requests found.',
+}) {
   const { data, loading, error, reload } = useFetch('/api/supply-requests')
   const [message, setMessage] = useState({ type: 'success', text: '' })
 
@@ -55,7 +59,7 @@ function SupplyRequestsView({ canReview = false, showSupplier = false }) {
       <PageHeader title="Supply Requests" />
       <Notice>{error}</Notice>
       <Notice type={message.type}>{message.text}</Notice>
-      <DataTable columns={columns} rows={toList(data)} loading={loading} />
+      <DataTable columns={columns} rows={toList(data)} loading={loading} empty={emptyMessage} />
     </div>
   )
 }

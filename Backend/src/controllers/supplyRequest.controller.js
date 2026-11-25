@@ -76,6 +76,17 @@ export async function getSupplyRequests(req, res) {
     }
 }
 
+export async function getSupplyRequestWarehouses(_req, res) {
+    try {
+        const warehouses = await warehouseModel.find({})
+            .select("name location")
+            .sort({ createdAt: -1 });
+        return res.status(200).json({ warehouses });
+    } catch (error) {
+        return sendControllerError(res, error, "Unable to retrieve warehouses.");
+    }
+}
+
 export async function updateSupplyRequestStatus(req, res) {
     const { id } = req.params;
     const { status } = req.body ?? {};

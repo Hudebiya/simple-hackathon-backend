@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { ROLE_CONFIG } from '../utils/roles.js'
+import ThemeToggle from './ThemeToggle.jsx'
 
 function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -22,7 +23,7 @@ function DashboardLayout() {
   return (
     <div className="min-h-screen bg-brand-background text-slate-900">
       {open && (
-        <div className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" onClick={() => setOpen(false)} />
+        <div className="fixed inset-0 z-30 bg-slate-900/40 dark:bg-black/50 lg:hidden" onClick={() => setOpen(false)} />
       )}
 
       <aside
@@ -58,7 +59,7 @@ function DashboardLayout() {
           >
             ☰
           </button>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {user.image && (
               <img src={user.image} alt="" className="h-9 w-9 rounded-full border border-slate-200 object-cover" />
             )}
@@ -66,6 +67,7 @@ function DashboardLayout() {
               <p className="text-sm font-semibold">{user.name}</p>
               <p className="text-xs text-slate-500">{config.label}</p>
             </div>
+            <ThemeToggle />
             <button
               type="button"
               onClick={handleLogout}
